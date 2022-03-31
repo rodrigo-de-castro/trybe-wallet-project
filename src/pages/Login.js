@@ -33,7 +33,6 @@ class Login extends React.Component {
 
   render() {
     const { email, password } = this.state;
-    const { dispatchLogin } = this.props;
     return (
       <div>
         <label htmlFor="emailInput">
