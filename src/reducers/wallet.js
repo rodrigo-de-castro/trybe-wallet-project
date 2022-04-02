@@ -11,6 +11,8 @@ function wallet(state = initialState, action) {
     return { ...state, isFetching: true };
   case 'GET_CURRENCIES':
     return { ...state, isFetching: false, currencies: action.payload };
+  case 'ADD_EXPENSE':
+    return { ...state, expenses: [...state.expenses, action.payload] };
   default:
     return state;
   }

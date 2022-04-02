@@ -28,4 +28,17 @@ export function fetchCurrencies() {
   };
 }
 
-// export const addExpense = (value) => ({ type: 'ADD_EXPENSE', data: value });
+export function addNewExpense(exchangeRates, value) {
+  const obj = { ...value, exchangeRates };
+  return { type: 'ADD_EXPENSE', payload: obj };
+}
+
+export function addExpense(value) {
+  return (dispatch) => {
+    dispatch(requestCurrencies());
+    return fetch('https://economia.awesomeapi.com.br/json/all')
+      .then((response) => response.json())
+      .then((exchangeRates) => dispatch(addNewExpense(exchangeRates, value)))
+      .catch((error) => dispatch(failedRequest(error)));
+  };
+}
