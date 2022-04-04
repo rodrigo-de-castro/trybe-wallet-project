@@ -43,6 +43,6 @@ export function addExpense(value) {
   };
 }
 
-export function deleteExpense(value) {
-  return { type: 'DELETE_EXPENSE', payload: value };
+export function updateExpense(value) {
+  return { type: 'UPDATE_EXPENSE', payload: value };
 }

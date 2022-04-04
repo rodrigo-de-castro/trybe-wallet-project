@@ -1,17 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { addExpense, deleteExpense, fetchCurrencies } from '../actions';
+import { addExpense, updateExpense, fetchCurrencies } from '../actions';
 
 class Wallet extends React.Component {
   constructor() {
     super();
-    this.state = {
-      valueInput: 0,
-      descriptionInput: '',
+    this.state = { valueInput: 0,
+      dscIpt: '',
       moeda: '',
-      methodInput: '',
+      methodIpt: '',
       tagInput: '',
+      action: 'add',
+      currentId: '',
     };
   }
 
@@ -26,45 +27,58 @@ class Wallet extends React.Component {
 
   handleClickSubmit = () => {
     const { addExpenses, expenses } = this.props;
-    const {
-      valueInput,
-      descriptionInput,
-      moeda,
-      methodInput,
-      tagInput,
+    const { valueInput, dscIpt, moeda, methodIpt, tagInput,
     } = this.state;
-    const expense = {
-      id: expenses.length,
+    const expense = { id: expenses.length,
       value: valueInput,
-      description: descriptionInput,
+      description: dscIpt,
       currency: moeda,
-      method: methodInput,
+      method: methodIpt,
       tag: tagInput,
     };
     addExpenses(expense);
-    this.setState({
-      valueInput: 0,
-      descriptionInput: '',
-      moeda: '',
-      methodInput: '',
-      tagInput: '',
+    this.setState(
+      { valueInput: 0, dscIpt: '', moeda: '', methodIpt: '', tagInput: '',
+      },
+    );
+  }
+
+  handleClickEdit = () => {
+    const { updateExpenses, expenses } = this.props;
+    const { valueInput, dscIpt, moeda, methodIpt, tagInput, currentId,
+    } = this.state;
+    const despesas = expenses;
+    despesas.forEach((despesa) => {
+      if (despesa.id === currentId) {
+        despesa.value = valueInput;
+        despesa.description = dscIpt;
+        despesa.currency = moeda;
+        despesa.method = methodIpt;
+        despesa.tag = tagInput;
+      }
     });
+    updateExpenses(despesas);
+    this.setState(
+      { valueInput: 0, dscIpt: '', moeda: '', methodIpt: '', tagInput: '', action: 'add',
+      },
+    );
   }
 
   deleteExpense = (expenseId) => {
-    const { expenses, deleteExpenses } = this.props;
+    const { expenses, updateExpenses } = this.props;
     const newState = expenses.filter((expense) => expense.id !== expenseId);
-    deleteExpenses(newState);
+    updateExpenses(newState);
+  }
+
+  handleUpdateExpense = (expenseId) => {
+    this.setState({ action: 'edit',
+      currentId: expenseId,
+    });
   }
 
   render() {
     const { emailUser, currencies, expenses } = this.props;
-    const {
-      valueInput,
-      descriptionInput,
-      moeda,
-      methodInput,
-      tagInput,
+    const { valueInput, dscIpt, moeda, methodIpt, tagInput, action,
     } = this.state;
     return (
       <>
@@ -88,13 +102,13 @@ class Wallet extends React.Component {
               onChange={ this.onInputChange }
             />
           </label>
-          <label htmlFor="descriptionInput">
+          <label htmlFor="dscIpt">
             Descrição:
             <input
-              id="descriptionInput"
+              id="dscIpt"
               data-testid="description-input"
-              name="descriptionInput"
-              value={ descriptionInput }
+              name="dscIpt"
+              value={ dscIpt }
               onChange={ this.onInputChange }
             />
           </label>
@@ -102,6 +116,7 @@ class Wallet extends React.Component {
             Moeda
             <select
               id="moeda"
+              data-testid="currency-input"
               name="moeda"
               label="moeda"
               value={ moeda }
@@ -111,13 +126,13 @@ class Wallet extends React.Component {
                 .map((currency) => (<option key={ currency }>{currency}</option>))}
             </select>
           </label>
-          <label htmlFor="methodInput">
+          <label htmlFor="methodIpt">
             Método de Pagamento:
             <select
-              id="methodInput"
+              id="methodIpt"
               data-testid="method-input"
-              name="methodInput"
-              value={ methodInput }
+              name="methodIpt"
+              value={ methodIpt }
               onChange={ this.onInputChange }
             >
               <option>Dinheiro</option>
@@ -141,12 +156,20 @@ class Wallet extends React.Component {
               <option>Saúde</option>
             </select>
           </label>
-          <button
-            type="button"
-            onClick={ this.handleClickSubmit }
-          >
-            Adicionar despesa
-          </button>
+          {action === 'add' ? (
+            <button
+              type="button"
+              onClick={ this.handleClickSubmit }
+            >
+              Adicionar despesa
+            </button>)
+            : (
+              <button
+                type="button"
+                onClick={ this.handleClickEdit }
+              >
+                Editar despesa
+              </button>)}
         </form>
         <table>
           <thead>
@@ -182,7 +205,13 @@ class Wallet extends React.Component {
                   </td>
                   <td>Real</td>
                   <td>
-                    <button type="submit">Editar</button>
+                    <button
+                      type="submit"
+                      data-testid="edit-btn"
+                      onClick={ () => this.handleUpdateExpense(expense.id) }
+                    >
+                      Editar
+                    </button>
                     <button
                       type="submit"
                       data-testid="delete-btn"
@@ -198,23 +227,20 @@ class Wallet extends React.Component {
     );
   }
 }
-
 const mapStateToProps = (state) => ({
   emailUser: state.user.email,
   currencies: state.wallet.currencies,
   expenses: state.wallet.expenses,
 });
-
 const mapDispatchToProps = (dispatch) => ({
   fetchCurrency: () => dispatch(fetchCurrencies()),
   addExpenses: (value) => dispatch(addExpense(value)),
-  deleteExpenses: (value) => dispatch(deleteExpense(value)),
+  updateExpenses: (value) => dispatch(updateExpense(value)),
 });
-
 Wallet.propTypes = {
   emailUser: PropTypes.objectOf(PropTypes.string).isRequired,
   fetchCurrency: PropTypes.func.isRequired,
-  deleteExpenses: PropTypes.func.isRequired,
+  updateExpenses: PropTypes.func.isRequired,
   addExpenses: PropTypes.func.isRequired,
   currencies: PropTypes.arrayOf(PropTypes.string).isRequired,
   expenses: PropTypes.arrayOf(PropTypes.object).isRequired,
