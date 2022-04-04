@@ -42,3 +42,7 @@ export function addExpense(value) {
       .catch((error) => dispatch(failedRequest(error)));
   };
 }
+
+export function deleteExpense(value) {
+  return { type: 'DELETE_EXPENSE', payload: value };
+}

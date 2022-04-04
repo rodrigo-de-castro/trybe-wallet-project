@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { addExpense, fetchCurrencies } from '../actions';
+import { addExpense, deleteExpense, fetchCurrencies } from '../actions';
 
 class Wallet extends React.Component {
   constructor() {
@@ -49,6 +49,12 @@ class Wallet extends React.Component {
       methodInput: '',
       tagInput: '',
     });
+  }
+
+  deleteExpense = (expenseId) => {
+    const { expenses, deleteExpenses } = this.props;
+    const newState = expenses.filter((expense) => expense.id !== expenseId);
+    deleteExpenses(newState);
   }
 
   render() {
@@ -177,7 +183,13 @@ class Wallet extends React.Component {
                   <td>Real</td>
                   <td>
                     <button type="submit">Editar</button>
-                    <button type="submit">Excluir</button>
+                    <button
+                      type="submit"
+                      data-testid="delete-btn"
+                      onClick={ () => this.deleteExpense(expense.id) }
+                    >
+                      Excluir
+                    </button>
                   </td>
                 </tr>))}
           </tbody>
@@ -196,11 +208,13 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispatch) => ({
   fetchCurrency: () => dispatch(fetchCurrencies()),
   addExpenses: (value) => dispatch(addExpense(value)),
+  deleteExpenses: (value) => dispatch(deleteExpense(value)),
 });
 
 Wallet.propTypes = {
   emailUser: PropTypes.objectOf(PropTypes.string).isRequired,
   fetchCurrency: PropTypes.func.isRequired,
+  deleteExpenses: PropTypes.func.isRequired,
   addExpenses: PropTypes.func.isRequired,
   currencies: PropTypes.arrayOf(PropTypes.string).isRequired,
   expenses: PropTypes.arrayOf(PropTypes.object).isRequired,
