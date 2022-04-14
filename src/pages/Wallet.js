@@ -70,9 +70,14 @@ class Wallet extends React.Component {
     updateExpenses(newState);
   }
 
-  handleUpdateExpense = (expenseId) => {
+  handleUpdateExpense = (expenseId, description, tag, method, value, currency) => {
     this.setState({ action: 'edit',
       currentId: expenseId,
+      valueInput: value,
+      dscIpt: description,
+      moeda: currency,
+      methodIpt: method,
+      tagInput: tag,
     });
   }
 
@@ -208,7 +213,7 @@ class Wallet extends React.Component {
                     <button
                       type="submit"
                       data-testid="edit-btn"
-                      onClick={ () => this.handleUpdateExpense(expense.id) }
+                      onClick={ () => this.handleUpdateExpense(expense.id, expense.description, expense.tag, expense.method, expense.value, expense.currency) }
                     >
                       Editar
                     </button>
